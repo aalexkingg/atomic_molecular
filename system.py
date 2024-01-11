@@ -26,3 +26,7 @@ class Ion(Atom):
     def __int__(self, ion_charge):
         self.ion_charge: int = ion_charge
         super().charge += self.ion_charge
+        self.Zcore = self.ion_charge + 1    # e
+
+
+
