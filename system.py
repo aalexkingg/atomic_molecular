@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sci
 import pandas as pd
 
-element_lookup = pd.read_csv("Periodic Table of Elements.csv")
+element_lookup = pd.read_csv("../base/Periodic Table of Elements.csv")
 
 
 class Atom:
