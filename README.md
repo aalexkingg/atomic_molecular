@@ -31,6 +31,7 @@ Z = ion count + 1
 
 #### Energy Series
 
+![img_2.png](img_2.png)
 
 #### Emission
 
