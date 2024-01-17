@@ -25,19 +25,20 @@ def energy(level, Z=1, ev=True):
     return en / e_charge if ev else en
 
 
-def draw_energy_graph(max_levels, display=True):
+def draw_energy_graph(max_levels, z, display=True):
     global figs
     plt.figure(figs)
     figs += 1
     radius = np.linspace(1, max_levels, max_levels*4)
-    plt.plot(radius, energy(radius))
+    plt.plot(radius, energy(radius, z))
 
     for n in range(1, max_levels):
-        plt.hlines(y=energy(n), xmin=0, xmax=n, ls="--", color="red", label=f"n={n}")
+        y = energy(n, z)
+        plt.hlines(y=y, xmin=0, xmax=n, ls="--", color="red", label=f"n={n}")
 
-    plt.text(1.5, -13.6, "n = 1")
-    plt.text(2.5, -3.7, "n = 2")
-    plt.text(3.5, -1.8, "n = 3")
+        if n < 4:
+            plt.text(n + 0.5, y, f"n = {n}")
+
     plt.xlim(0.5, 10)
     plt.xlabel("Atomic radius, a_0")
     plt.ylabel("Energy (eV)")
@@ -118,7 +119,7 @@ def draw_angular_momentum():
 
 
 def main():
-    draw_energy_graph(10)
+    draw_energy_graph(10, 2)
     draw_radial()
 
     print(angular_momentum(0, 0, 0, 0))
