@@ -20,8 +20,8 @@ l_dict = {
 }
 
 
-def energy(level, ev=True):
-    en = -(ELECTRON.mass * e_charge ** 4) / (32 * np.pi**2 * e_0**2 * sci.hbar**2 * level**2)
+def energy(level, Z=1, ev=True):
+    en = -(ELECTRON.mass * e_charge ** 4 * Z**2) / (32 * np.pi**2 * e_0**2 * sci.hbar**2 * level**2)
     return en / e_charge if ev else en
 
 

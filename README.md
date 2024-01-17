@@ -29,7 +29,9 @@ Z = ion count + 1
 #### Rydberg 
 
 
-#### Energy Series
+#### Energy Levels
+
+$$E_n = -\frac{m_e Z^2_core e^4}{32 \pi^2 \epsilon^2_0 \hbar^2 n^2}$$
 
 ![img_2.png](img_2.png)
 
