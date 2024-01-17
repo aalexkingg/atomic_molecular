@@ -4,7 +4,7 @@ import scipy.constants as sci
 from base.atomic import look_up, e_charge, ELECTRON, e_0
 import math
 from vpython import *
-import qsharp
+#import qsharp
 
 wave_num = np.arange(-650, -100, 1)
 a_0 = (4 * np.pi * e_0 * sci.hbar**2) / (e_charge**2 * ELECTRON.mass)
@@ -81,25 +81,32 @@ def radial(n, l, r):
     return norm_const(n, l) * (2 / (n * a_0) * r)**l * np.exp(-1 / (2 * a_0) * r) * laguerre_polynomial(2*l+1, n-l-1, 2/(n * a_0)*r)
 
 
-def draw_radial():
+def legendre_polynomial(n, l, r):
+    return r**2 * radial(n, l, r)**2
+
+
+def draw_radial(display=True):
     global figs
     plt.figure(figs)
     figs += 1
 
     radius = np.linspace(1, 75, 75)
     print(radius)
-    plt.plot(radius, -ELECTRON.e_potential(ELECTRON, radius)/e_charge)
+    plt.plot(radius, energy(radius, ev=False)/(sci.h * sci.c * 100))
 
-    print(radial(1, 0, radius))
+    for n in range(1, 6):
+        plt.plot(radius, radial(n, l_dict['s'], radius), color="red")
+        plt.axhline(y=energy(n), ls="--", color="grey")
 
-    plt.plot(radius, radial(1, 0, radius))
+    #plt.text()
+    #plt.text()
 
+    plt.xlabel("Radial position, a_0")
+    plt.ylabel("Energy / hc")
+    plt.title("Radial Wavefunctions")
 
-    plt.show()
-
-
-def legendre_polynomial(n, l, r):
-    return r**2 * radial(n, l, r)**2
+    if display:
+        plt.show()
 
 
 def angular_momentum(l, m_l, theta, phi):
@@ -115,6 +122,7 @@ def main():
     draw_radial()
 
     print(angular_momentum(0, 0, 0, 0))
+
 
 if __name__ == "__main__":
     main()
