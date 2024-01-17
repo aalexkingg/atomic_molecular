@@ -35,10 +35,12 @@ The energy eigenvalues, E, can be determined using the Schrodinger equation $$\h
 
 $$E_n = -\frac{m_e Z^2_{core} e^4}{32 \pi^2 \epsilon^2_0 \hbar^2 n^2}$$
 
-where n = 1, 2, 3, ... is the principle quantum number
+where n = 1, 2, 3, ... is the principle quantum number.
 
-![img_2.png](img_2.png)
+![img_2.png](img_2.png).
 **Figure. 1** Electronic energy levels and Coulomb potential.
+
+
 
 #### Emission
 
