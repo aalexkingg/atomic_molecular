@@ -20,7 +20,7 @@ $$E_n = -\frac{m_e Z^2_{core} e^4}{32 \pi^2 \epsilon^2_0 \hbar^2 n^2}$$
 
 where n = 1, 2, 3, ... is the principle quantum number.
 
-![img_2.png](img_2.png)
+![img_2.png](img/img_2.png)
 
 .**Figure. 1** Electronic energy levels and Coulomb potential.
 
@@ -41,6 +41,15 @@ where n = 1, 2, 3, ... is the principle quantum number.
 
 ### Radial
 
+$$R_{n, l} = N_{n, l} (\frac{2}{n a_0} r)^l exp(-\frac{1}{n a_0} r) L^{2l+1}_{n-l-1} (\frac{2}{n a_0} r)$$
 
+Where $$N_{n, l} = $$
+
+and $$L $$
 
 ### Angular Momentum
+
+
+
+![img_3.png](img/img_3.png)
+
