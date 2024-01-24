@@ -66,6 +66,40 @@ and $$L $$
 
 ### Electronic Hamiltonian
 
-$$\hat{H}(\vec{r_1},\vec{r_2},\vec{r_3},...,\vec{r_N}) = \sum_{i=1}^N[-\frac{\hbar^2}{2m_e}\Delta_i^2 - \frac{Z_{nucl}e^2}{4 \pi \epsilon_0 r_i}] + \sum_{i=1}^N\sum_{j>1}^N \frac{e^2}{4 \pi \epsilon_0 r_{ij}$$
+The part at the end represents the electron-electron repulsion term $V_{rep}$
+
+$$\hat{H}(\vec{r_1},\vec{r_2},\vec{r_3},...,\vec{r_N}) = \sum_{i=1}^N(-\frac{\hbar^2}{2m_e}\nabla_i^2 - \frac{Z_{nucl}e^2}{4 \pi \epsilon_0 r_i}) + \sum_{i=1}^N \sum_{j>1}^N\frac{e^2}{4 \pi \epsilon_0 r_{ij})$$
+
+### Independent-Particle Model
+
+$$\hat{H}(\vec{r_1},\vec{r_2},\vec{r_3},...,\vec{r_N}) = \sum_i \hat{h}(\vec{r_i})$$
+
+
+### Central-Field Approximation
+
+
+## Part 3 - Indistinguishable Particles
+
+### The Pauli Principle
+
+
+### Spin Wavefunctions
+
+
+### Helium Atom Wavefunctions
+
+
+### Spin Multiplicity
+
+
+### Exhange
+
+
+### Electronic Configurations
+
+
+### 
+
+
 
 
