@@ -2,7 +2,16 @@
 
 "Periodic Table of Elements.csv" https://gist.github.com/GoodmanSciences/c2dd862cd38f21b0ad36b8f96b4bf1ee
 
-## Part 1
+## TODO
+
+ - Radial
+ - Angular
+ - Probable radius
+ - Degeneracy
+ - 
+
+
+## Part 1 - One-Electron Atoms
 
 ### Z
 
@@ -52,4 +61,11 @@ and $$L $$
 
 
 ![img_3.png](img/img_3.png)
+
+## Part 2 - Multi-Electron Atoms
+
+### Electronic Hamiltonian
+
+$$\hat{H}(\vec{r_1},\vec{r_2},\vec{r_3},...,\vec{r_N}) = \sum_{i=1}^N[-\frac{\hbar^2}{2m_e}\Delta_i^2 - \frac{Z_{nucl}e^2}{4 \pi \epsilon_0 r_i}] + \sum_{i=1}^N\sum_{j>1}^N \frac{e^2}{4 \pi \epsilon_0 r_{ij}$$
+
 

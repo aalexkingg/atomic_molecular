@@ -5,6 +5,8 @@ from base.atomic import look_up, e_charge, ELECTRON, e_0
 import math
 from vpython import *
 #import qsharp
+from sympy.physics.hydrogen import R_nl
+
 
 wave_num = np.arange(-650, -100, 1)
 a_0 = (4 * np.pi * e_0 * sci.hbar**2) / (e_charge**2 * ELECTRON.mass)
@@ -83,7 +85,7 @@ def laguerre_polynomial(b, a, x):
     return sum([(-1)**k * (math.factorial(a + b)) / (math.factorial(a - k) * math.factorial(b + k) * math.factorial(k)) * x**k for k in range(0, a+1)])
 
 
-def radial(n, l, r, output=False):
+def radial(n, l, r, particle=None, output=False):
     """
 
     :param n: principle quantum number
@@ -97,14 +99,26 @@ def radial(n, l, r, output=False):
     if output:
         print("N", N)
         print("L", L)
-    return N * (2 / (n * a_0) * r)**l * np.exp(-1 / (2 * a_0) * r) * L
+    return N * (2 / (n) * r)**l * np.exp(-1 / (2) * r) * L
 
 
 def legendre_polynomial(n, l, r):
+    """
+
+    :param n:
+    :param l:
+    :param r:
+    :return:
+    """
     return r**2 * radial(n, l, r)**2
 
 
 def draw_radial(display=True):
+    """
+
+    :param display:
+    :return:
+    """
     global figs
     plt.figure(figs)
     figs += 1
@@ -113,10 +127,15 @@ def draw_radial(display=True):
 
     plt.plot(radius, energy(radius, ev=False)/(sci.h * sci.c * 100))
 
+    print("me: ", radial(1, 0, radius[20], output=True))
+    print("sympy: ", R_nl(1, 0, radius[20], 1))
+
     #r = radial(2, 1, radius)
 
-    for n in range(1, 6):
-        plt.plot(radius, radial(n, l_dict['s'], radius), color="red")
+    for n in range(1, 2):
+        radial_func = [-R_nl(n, 0, r)*(sci.h * sci.c * 100) for r in radius]
+        print(radial_func)
+        plt.plot(radius, radial_func, color="red")
         plt.axhline(y=energy(n), ls="--", color="grey")
 
     plt.xlabel("Radial position, a_0")
@@ -126,12 +145,20 @@ def draw_radial(display=True):
     if display:
         plt.show()
 
-    R = legendre_polynomial(1, 0, radius)
-    print(R)
-    plt.plot(radius, R)
-    plt.show()
+    #R = legendre_polynomial(1, 0, radius)
+    #print(R)
+    #plt.plot(radius, R)
+    #plt.show()
 
 def angular_momentum(l, m_l, theta, phi):
+    """
+
+    :param l:
+    :param m_l:
+    :param theta:
+    :param phi:
+    :return:
+    """
     return (1 / np.sqrt(2 * np.pi)) * np.exp(np.imag * m_l * phi) * (((2 * l + 1) * math.factorial(l - abs(m_l))) / (2 * math.factorial(l + abs(m_l))))**(1/2) * legendre_polynomial(abs(m_l), l, np.cos(theta))
 
 
@@ -143,11 +170,26 @@ def spin():
     ...
 
 
+def transition(inital, final, particle=None, output=True) -> float:
+    """
+
+    :param inital:
+    :param final:
+    :param particle:
+    :param output:
+    :return: Energy
+    """
+    n_i, l_i = int(inital[0]), l_dict[inital[1]]
+    n_f, l_f = int(final[0]), l_dict[final[1]]
+
+
+
+
+
 
 def main():
     draw_energy_graph(10, 2)
     draw_radial()
-
 
 
     #print(angular_momentum(0, 0, 0, 0))
