@@ -72,6 +72,8 @@ $$\hat{H}(\vec{r_1},\vec{r_2},\vec{r_3},...,\vec{r_N}) = \sum_{i=1}^N(-\frac{\hb
 
 ### Independent-Particle Model
 
+
+
 $$\hat{H}(\vec{r_1},\vec{r_2},\vec{r_3},...,\vec{r_N}) = \sum_i \hat{h}(\vec{r_i})$$
 
 
