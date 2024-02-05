@@ -1,5 +1,5 @@
 from vpython import *
-import base.atomic as atomic
+#import base.atomic as atomic
 
 # constants
 WIDTH = 800
@@ -9,9 +9,9 @@ k = 1.4E-23  # Boltzmann constant
 
 
 class GasAnimation:
-    def __init__(self):
+    def __init__(self, atom=None):
         """
-
+        :param atom: Atom Element
         """
         self.deltav = 100  # binning for v histogram
         self.nhisto = 0  # number of histogram snapshots to average
@@ -21,113 +21,127 @@ class GasAnimation:
 
         # self.particle_count_slider = slider(bind=set_count, min=1, max=300, align='right')
 
-        self.draw_speed_graph()
-
-        self.num_atoms = 20  # change this to have more or fewer atoms
+        self.num_atoms = 200  # change this to have more or fewer atoms
 
         # Typical values
         self.L = 1  # container is a cube L on a side
-        gray = color.gray(0.7)  # color of edges of container
+        self.gray = color.gray(0.7)  # color of edges of container
         self.mass = 4E-3 / 6E23  # helium mass
         self.Ratom = 0.03  # wildly exaggerated size of helium atom
 
         self.T = 300  # around room temperature
         self.dt = 1E-5
 
+        self.atoms = []
+        self.p = []
+        self.apos = []
+        self.p_avg = sqrt(2 * self.mass * 1.5 * k * self.T)  # average kinetic energy p**2/(2mass) = (3/2)kT
 
+        self.nhisto = int(4500 / self.deltav)
+        self.histo = []
 
+        self.draw_box()
+        self.draw_speed_graph()
 
     def start(self):
         """
 
         :return:
         """
-        Atoms = []
-        p = []
-        apos = []
-        pavg = sqrt(2 * mass * 1.5 * k * T)  # average kinetic energy p**2/(2mass) = (3/2)kT
+        self.create_particles()
 
-        nhisto = int(4500 / deltav)
-        histo = []
-        for i in range(nhisto): histo.append(0.0)
-        histo[barx(pavg / mass)] = Natoms
+        for i in range(self.nhisto):
+            self.histo.append(0.0)
+
+        self.histo[self.barx(self.p_avg / self.mass)] = self.num_atoms
 
         accum = []
-        for i in range(int(3000 / deltav)): accum.append([deltav * (i + .5), 0])
-        vdist = gvbars(color=color.red, delta=deltav)
+        for i in range(int(3000 / self.deltav)):
+            accum.append([self.deltav * (i + .5), 0])
+
+        vdist = gvbars(color=color.red, delta=self.deltav)
 
         while True:
+            # Check for input event from sliders/inputs
+
+
+
             rate(300)
+
             # Accumulate and average histogram snapshots
-            for i in range(len(accum)): accum[i][1] = (nhisto * accum[i][1] + histo[i]) / (nhisto + 1)
-            if nhisto % 10 == 0:
+            for i in range(len(accum)):
+                accum[i][1] = (self.nhisto * accum[i][1] + self.histo[i]) / (self.nhisto + 1)
+
+            if self.nhisto % 10 == 0:
                 vdist.data = accum
-            nhisto += 1
+            self.nhisto += 1
 
             # Update all positions
-            for i in range(Natoms): Atoms[i].pos = apos[i] = apos[i] + (p[i] / mass) * dt
+            for i in range(self.num_atoms):
+                self.atoms[i].pos = self.apos[i] = self.apos[i] + (self.p[i] / self.mass) * self.dt
 
             # Check for collisions
-            hitlist = self.checkCollisions()
-
             # If any collisions took place, update momenta of the two atoms
-            for ij in hitlist:
+            for ij in self.checkCollisions():
                 i = ij[0]
                 j = ij[1]
-                ptot = p[i] + p[j]
-                posi = apos[i]
-                posj = apos[j]
-                vi = p[i] / mass
-                vj = p[j] / mass
+                ptot = self.p[i] + self.p[j]
+                posi = self.apos[i]
+                posj = self.apos[j]
+                vi = self.p[i] / self.mass
+                vj = self.p[j] / self.mass
                 vrel = vj - vi
                 a = vrel.mag2
-                if a == 0: continue;  # exactly same velocities
+                if a == 0:
+                    continue  # exactly same velocities
+
                 rrel = posi - posj
-                if rrel.mag > Ratom: continue  # one atom went all the way through another
+                if rrel.mag > self.Ratom:
+                    continue  # one atom went all the way through another
 
                 # theta is the angle between vrel and rrel:
                 dx = dot(rrel, vrel.hat)  # rrel.mag*cos(theta)
                 dy = cross(rrel, vrel.hat).mag  # rrel.mag*sin(theta)
                 # alpha is the angle of the triangle composed of rrel, path of atom j, and a line
                 #   from the center of atom i to the center of atom j where atome j hits atom i:
-                alpha = asin(dy / (2 * Ratom))
-                d = (2 * Ratom) * cos(alpha) - dx  # distance traveled into the atom from first contact
+                alpha = asin(dy / (2 * self.Ratom))
+                d = (2 * self.Ratom) * cos(alpha) - dx  # distance traveled into the atom from first contact
                 deltat = d / vrel.mag  # time spent moving from first contact to position inside atom
 
                 posi = posi - vi * deltat  # back up to contact configuration
                 posj = posj - vj * deltat
-                mtot = 2 * mass
-                pcmi = p[i] - ptot * mass / mtot  # transform momenta to cm frame
-                pcmj = p[j] - ptot * mass / mtot
+                mtot = 2 * self.mass
+                pcmi = self.p[i] - ptot * self.mass / mtot  # transform momenta to cm frame
+                pcmj = self.p[j] - ptot * self.mass / mtot
                 rrel = norm(rrel)
                 pcmi = pcmi - 2 * pcmi.dot(rrel) * rrel  # bounce in cm frame
                 pcmj = pcmj - 2 * pcmj.dot(rrel) * rrel
-                p[i] = pcmi + ptot * mass / mtot  # transform momenta back to lab frame
-                p[j] = pcmj + ptot * mass / mtot
-                apos[i] = posi + (p[i] / mass) * deltat  # move forward deltat in time
-                apos[j] = posj + (p[j] / mass) * deltat
-                interchange(vi.mag, p[i].mag / mass)
-                interchange(vj.mag, p[j].mag / mass)
+                self.p[i] = pcmi + ptot * self.mass / mtot  # transform momenta back to lab frame
+                self.p[j] = pcmj + ptot * self.mass / mtot
+                self.apos[i] = posi + (self.p[i] / self.mass) * deltat  # move forward deltat in time
+                self.apos[j] = posj + (self.p[j] / self.mass) * deltat
+                self.interchange(vi.mag, self.p[i].mag / self.mass)
+                self.interchange(vj.mag, self.p[j].mag / self.mass)
 
-            for i in range(Natoms):
-                loc = apos[i]
-                if abs(loc.x) > L / 2:
+            for i in range(self.num_atoms):
+                loc = self.apos[i]
+                if abs(loc.x) > self.L / 2:
                     if loc.x < 0:
-                        p[i].x = abs(p[i].x)
+                        self.p[i].x = abs(self.p[i].x)
                     else:
-                        p[i].x = -abs(p[i].x)
+                        self.p[i].x = -abs(self.p[i].x)
 
-                if abs(loc.y) > L / 2:
+                if abs(loc.y) > self.L / 2:
                     if loc.y < 0:
-                        p[i].y = abs(p[i].y)
+                        self.p[i].y = abs(self.p[i].y)
                     else:
-                        p[i].y = -abs(p[i].y)
+                        self.p[i].y = -abs(self.p[i].y)
 
-                if abs(loc.z) > L / 2:
+                if abs(loc.z) > self.L / 2:
                     if loc.z < 0:
-                        p[i].z = abs(p[i].z)
+                        self.p[i].z = abs(self.p[i].z)
                     else:
-                        p[i].z = -abs(p[i].z)
+                        self.p[i].z = -abs(self.p[i].z)
 
     def restart(self):
         """
@@ -142,16 +156,16 @@ class GasAnimation:
 
         :return:
         """
-        d = L / 2 + Ratom
+        d = self.L / 2 + self.Ratom
         r = 0.005
-        boxbottom = curve(color=gray, radius=r)
+        boxbottom = curve(color=self.gray, radius=r)
         boxbottom.append([vector(-d, -d, -d), vector(-d, -d, d), vector(d, -d, d), vector(d, -d, -d), vector(-d, -d, -d)])
-        boxtop = curve(color=gray, radius=r)
+        boxtop = curve(color=self.gray, radius=r)
         boxtop.append([vector(-d, d, -d), vector(-d, d, d), vector(d, d, d), vector(d, d, -d), vector(-d, d, -d)])
-        vert1 = curve(color=gray, radius=r)
-        vert2 = curve(color=gray, radius=r)
-        vert3 = curve(color=gray, radius=r)
-        vert4 = curve(color=gray, radius=r)
+        vert1 = curve(color=self.gray, radius=r)
+        vert2 = curve(color=self.gray, radius=r)
+        vert3 = curve(color=self.gray, radius=r)
+        vert4 = curve(color=self.gray, radius=r)
         vert1.append([vector(-d, -d, -d), vector(-d, d, -d)])
         vert2.append([vector(-d, -d, d), vector(-d, d, d)])
         vert3.append([vector(d, -d, d), vector(d, d, d)])
@@ -162,23 +176,30 @@ class GasAnimation:
 
         :return:
         """
-        for i in range(Natoms):
-            x = L * random() - L / 2
-            y = L * random() - L / 2
-            z = L * random() - L / 2
+        for i in range(self.num_atoms):
+            x = self.L * random() - self.L / 2
+            y = self.L * random() - self.L / 2
+            z = self.L * random() - self.L / 2
             if i == 0:
-                Atoms.append(
-                    sphere(pos=vector(x, y, z), radius=Ratom / 2, color=color.cyan, make_trail=False, retain=100,
-                           trail_radius=0.3 * Ratom))
+                self.atoms.append(
+                    sphere(
+                        pos=vector(x, y, z),
+                        radius=self.Ratom / 2,
+                        color=color.cyan,
+                        make_trail=False,
+                        retain=100,
+                        trail_radius=0.3 * self.Ratom
+                    )
+                )
             else:
-                Atoms.append(sphere(pos=vector(x, y, z), radius=Ratom / 2, color=gray))
-            apos.append(vec(x, y, z))
+                self.atoms.append(sphere(pos=vector(x, y, z), radius=self.Ratom / 2, color=self.gray))
+            self.apos.append(vec(x, y, z))
             theta = pi * random()
             phi = 2 * pi * random()
-            px = pavg * sin(theta) * cos(phi)
-            py = pavg * sin(theta) * sin(phi)
-            pz = pavg * cos(theta)
-            p.append(vector(px, py, pz))
+            px = self.p_avg * sin(theta) * cos(phi)
+            py = self.p_avg * sin(theta) * sin(phi)
+            pz = self.p_avg * cos(theta)
+            self.p.append(vector(px, py, pz))
 
     def draw_speed_graph(self):
         """
@@ -192,14 +213,14 @@ class GasAnimation:
             align='right',
             xtitle='speed, m/s',
             ytitle='Number of atoms',
-            ymax=1000
+            ymax=100
         )
         theory = gcurve(color=color.blue, width=2)
 
         dv = 10
         for v in range(0, 3001 + dv, dv):  # theoretical prediction
-            theory.plot(v, (deltav / dv) * Natoms * 4 * pi * ((mass / (2 * pi * k * T)) ** 1.5) * exp(
-                -0.5 * mass * (v ** 2) / (k * T)) * (v ** 2) * dv)
+            theory.plot(v, (self.deltav / dv) * self.num_atoms * 4 * pi * ((self.mass / (2 * pi * k * self.T)) ** 1.5) * exp(
+                -0.5 * self.mass * (v ** 2) / (k * self.T)) * (v ** 2) * dv)
 
     def checkCollisions(self):
         """
@@ -207,12 +228,12 @@ class GasAnimation:
         :return:
         """
         hitlist = []
-        r2 = 2 * Ratom
+        r2 = 2 * self.Ratom
         r2 *= r2
-        for i in range(Natoms):
-            ai = apos[i]
+        for i in range(self.num_atoms):
+            ai = self.apos[i]
             for j in range(i):
-                aj = apos[j]
+                aj = self.apos[j]
                 dr = ai - aj
                 if mag2(dr) < r2: hitlist.append([i, j])
         return hitlist
@@ -226,7 +247,7 @@ class GasAnimation:
         :param v:
         :return:
         """
-        return int(v / deltav)  # index into bars array
+        return int(v / self.deltav)  # index into bars array
 
 
     def set_count(self, evt):
@@ -235,8 +256,7 @@ class GasAnimation:
         :param evt:
         :return:
         """
-        global Natoms
-        Natoms = floor(evt.value)
+        self.num_atoms = floor(evt.value)
 
 
     def interchange(self, v1, v2):  # remove from v1 bar, add to v2 bar
@@ -246,12 +266,14 @@ class GasAnimation:
         :param v2:
         :return:
         """
-        barx1 = barx(v1)
-        barx2 = barx(v2)
-        if barx1 == barx2:  return
-        if barx1 >= len(histo) or barx2 >= len(histo): return
-        histo[barx1] -= 1
-        histo[barx2] += 1
+        barx1 = self.barx(v1)
+        barx2 = self.barx(v2)
+        if barx1 == barx2:
+            return
+        if barx1 >= len(self.histo) or barx2 >= len(self.histo):
+            return
+        self.histo[barx1] -= 1
+        self.histo[barx2] += 1
 
 
 
